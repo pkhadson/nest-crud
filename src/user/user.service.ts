@@ -2,10 +2,12 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from './user.dtos';
 import * as constants from './user.constants';
+import { Model } from 'mongoose';
+import { User } from './user.model';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private readonly userModel) {}
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
   /**
    * @param payload - user data
@@ -27,7 +29,7 @@ export class UserService {
    * @description - checks if user with given login exists
    * @example - checkUser('user1')
    */
-  checkUser(login: string): Promise<boolean> {
+  checkUser(login: string) {
     return this.userModel.exists({ login });
   }
 

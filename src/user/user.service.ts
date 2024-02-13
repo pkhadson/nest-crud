@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from './user.dtos';
 import * as constants from './user.constants';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { User } from './user.model';
 
 @Injectable()
@@ -35,5 +35,9 @@ export class UserService {
 
   getUserWorkspaces(userId: string) {
     throw new Error('Method not implemented.');
+  }
+
+  existsById(userId: string) {
+    return this.userModel.exists({ _id: new mongoose.Types.ObjectId(userId) });
   }
 }

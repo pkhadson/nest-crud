@@ -9,7 +9,7 @@ export class User {
   name: string;
 
   @Prop()
-  login: number;
+  login: string;
 
   @Prop({ select: false })
   password: string;

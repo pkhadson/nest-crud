@@ -13,9 +13,9 @@ export class UserService {
    * @param payload - user data
    * @returns - created user
    * @description - creates a new user
-   * @example - createUser({ name: 'User', login: 'user1', password: 'password' })
+   * @example - create({ name: 'User', login: 'user1', password: 'password' })
    */
-  async createUser(payload: CreateUserDto) {
+  async create(payload: CreateUserDto) {
     if (await this.checkUser(payload.login))
       throw new BadRequestException(constants.LOGIN_ALREADY_EXISTS);
 

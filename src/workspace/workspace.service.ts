@@ -45,4 +45,8 @@ export class WorkspaceService {
     await this.workspaceModel.deleteOne({ _id: new Types.ObjectId(id) });
     return { deleted: true };
   }
+
+  workspaceExists(workspaceId: string) {
+    return this.workspaceModel.exists({ _id: new Types.ObjectId(workspaceId) });
+  }
 }

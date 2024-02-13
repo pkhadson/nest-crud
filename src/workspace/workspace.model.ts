@@ -13,7 +13,7 @@ export class Workspace {
     type: mongoose.Schema.Types.ObjectId,
     ref: User.name,
   })
-  userId: number;
+  userId: string;
 }
 
 export const WorkspaceSchema = SchemaFactory.createForClass(Workspace);

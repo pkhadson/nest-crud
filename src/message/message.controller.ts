@@ -6,9 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
-import { CreateMessageDto, UpdateMessageDto } from './message.dtos';
+import {
+  CreateMessageDto,
+  IMessageSearchFilter,
+  UpdateMessageDto,
+} from './message.dtos';
 
 @Controller('workspace/:workspaceId/message')
 export class MessageController {
@@ -28,6 +33,15 @@ export class MessageController {
     return this.messageService.findAll();
   }
 
+  @Get('search')
+  search(
+    @Param('workspaceId') workspaceId: string,
+    @Query()
+    filter?: IMessageSearchFilter,
+  ) {
+    return this.messageService.search(workspaceId, filter);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.messageService.findOne(id);
@@ -41,5 +55,10 @@ export class MessageController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.messageService.remove(id);
+  }
+
+  @Post(':id/like')
+  like(@Param('id') id: string) {
+    return this.messageService.like(id);
   }
 }

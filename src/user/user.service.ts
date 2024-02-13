@@ -7,7 +7,11 @@ import { User } from './user.model';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) {
+    this.getUserWorkspaces('65cbcbf74e034f8a6476e0ce').then((a) =>
+      console.log(JSON.stringify(a, null, 2)),
+    );
+  }
 
   /**
    * @param payload - user data
@@ -33,8 +37,51 @@ export class UserService {
     return this.userModel.exists({ login });
   }
 
-  getUserWorkspaces(userId: string) {
-    throw new Error('Method not implemented.');
+  async getUserWorkspaces(userId: string) {
+    /* It can be implemented with populate method or aggregation */
+    /* but following the requirements, it should be implemented with aggregation */
+    const [user] = await this.userModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: 'workspaces',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'workspaces',
+        },
+      },
+      {
+        $unwind: '$workspaces', // Deconstruct the workspaces array
+      },
+      {
+        $lookup: {
+          from: 'messages',
+          localField: 'workspaces._id',
+          foreignField: 'workspaceId',
+          as: 'workspaces.messages',
+        },
+      },
+      {
+        $group: {
+          _id: '$_id', // Group by the original user document _id
+          root: { $first: '$$ROOT' }, // Use $$ROOT to preserve the original document
+          workspaces: { $push: '$workspaces' }, // Reconstruct the workspaces array with messages
+        },
+      },
+      {
+        $replaceRoot: {
+          newRoot: {
+            $mergeObjects: ['$root', { workspaces: '$workspaces' }], // Merge the reconstructed workspaces array back into the original document
+          },
+        },
+      },
+    ]);
+
+    return user;
   }
 
   existsById(userId: string) {

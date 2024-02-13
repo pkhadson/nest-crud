@@ -1,8 +1,12 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { CreateMessageDto, UpdateMessageDto } from './message.dtos';
+import {
+  CreateMessageDto,
+  IMessageSearchFilter,
+  UpdateMessageDto,
+} from './message.dtos';
 import * as constants from './message.constants';
 import { WorkspaceService } from 'src/workspace/workspace.service';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Message } from './message.model';
 
 @Injectable()
@@ -33,5 +37,32 @@ export class MessageService {
 
   remove(id: string) {
     return this.messageModel.findByIdAndDelete(id);
+  }
+
+  search(workspaceId: string, filter: IMessageSearchFilter) {
+    const { content, startDate, endDate, limit, offset, startLike, endLike } =
+      filter || {};
+
+    const filterQuery: FilterQuery<Message> = {};
+
+    if (content) filterQuery.content = { $regex: content, $options: 'i' };
+    if (startDate) filterQuery.createdAt = { $gte: new Date(startDate) };
+    if (endDate)
+      filterQuery.createdAt = {
+        ...filterQuery.createdAt,
+        $lte: new Date(endDate),
+      };
+    if (startLike || endDate) filterQuery.likes = {};
+    if (startLike) filterQuery.likes.$gte = startLike;
+    if (endLike) filterQuery.likes.$lte = endLike;
+
+    return this.messageModel
+      .find(filterQuery)
+      .limit(limit || 100)
+      .skip(offset || 0);
+  }
+
+  like(id: string) {
+    return this.messageModel.findByIdAndUpdate(id, { $inc: { likes: 1 } });
   }
 }

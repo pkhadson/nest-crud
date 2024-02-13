@@ -9,3 +9,13 @@ export class CreateMessageDto {
 }
 
 export class UpdateMessageDto extends PartialType(CreateMessageDto) {}
+
+export interface IMessageSearchFilter {
+  content?: string;
+  startDate?: string;
+  endDate?: string;
+  limit?: number;
+  offset?: number;
+  startLike?: string;
+  endLike?: string;
+}

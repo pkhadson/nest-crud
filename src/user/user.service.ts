@@ -7,11 +7,7 @@ import { User } from './user.model';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {
-    this.getUserWorkspaces('65cbcbf74e034f8a6476e0ce').then((a) =>
-      console.log(JSON.stringify(a, null, 2)),
-    );
-  }
+  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
   /**
    * @param payload - user data
